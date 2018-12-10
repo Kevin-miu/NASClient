@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/dialog_round_white"
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_horizontal"
+        android:padding="12dp"
+        android:text="提示"
+        android:textColor="@color/black"
+        android:textSize="16sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="用户名："
+                android:textColor="@color/font_common_1"/>
+
+            <EditText
+                android:id="@+id/dialog_username"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:hint="例如 root"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="密  码："
+                android:textColor="@color/font_common_1"/>
+
+            <EditText
+                android:id="@+id/dialog_passwd"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:hint="例如 12345"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/dialog_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:scaleX="0.6"
+            android:scaleY="0.6"
+            android:textSize="20sp"
+            android:textColor="@color/font_common_2"
+            android:text="记住密码"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/commom_background"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialog_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:background="@drawable/dialog_left_btn"
+                android:gravity="center"
+                android:text="取消"
+                android:textColor="@color/font_common_2"
+                android:textSize="12sp"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/commom_background"/>
+
+            <TextView
+                android:id="@+id/dialog_submit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.0"
+                android:background="@drawable/dialog_right_bt"
+                android:gravity="center"
+                android:text="确定"
+                android:textColor="@color/font_blue"
+                android:textSize="12sp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

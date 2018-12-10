@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/point_tx1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="积分功能待定"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/point_tx2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/point_tx3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:textSize="16sp"/>
+
+</RelativeLayout>

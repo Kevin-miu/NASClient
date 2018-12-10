@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">NASClient</string>
+    <string name="btn_scan">扫描</string>
+    <string name="btn_add">添加</string>
+    <string name="btn_upload">上传</string>
+    <string name="btn_download">下载</string>
+    <string name="btn_folder">文件夹</string>
+    <string name="title_cloud">云盘</string>
+    <string name="title_point">积分</string>
+    <string name="title_setting">设置</string>
+</resources>

@@ -46,6 +46,7 @@ jcifs的开发方法类似java文件操作功能，它的资源url定位：smb:/
 
 ```java
 NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("192.168.1.103", "Administrator", "19921103");
+SmbFile smbFile = new SmbFile(path, auth);
 ```
 
 进行登录验证。
@@ -53,3 +54,5 @@ NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication("192.168.1.103"
 SMB文件的获取、新建、写入、删除操作均很简单，看代码就能懂，不作详述。
 
 ## 使用效果
+
+![image](https://github.com/Kevin-miu/NASClient/blob/master/img/show.gif)

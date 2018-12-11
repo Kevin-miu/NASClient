@@ -289,7 +289,6 @@ public class FileFragment extends Fragment {
         if (titlePathList.size() == 1) {
             //跳回cloudfragment
             mHomeActivity.getFragmentManager().beginTransaction().replace(R.id.container_layout, cloudFragment).commit();
-            mHomeActivity = null;
         } else {
             //跳回上一页
             mTitleAdapter.removeItem(titlePathList.size() - 1);

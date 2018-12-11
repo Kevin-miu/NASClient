@@ -1,5 +1,6 @@
 package client.nas.find.com.nasclient.activity;
 
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -21,10 +23,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import client.nas.find.com.nasclient.R;
+import client.nas.find.com.nasclient.activity.base.MultiView;
 import client.nas.find.com.nasclient.adapter.DeviceAdapter;
 import client.nas.find.com.nasclient.bean.DeviceBean;
+import client.nas.find.com.nasclient.util.CommomUtil;
 import client.nas.find.com.nasclient.util.LocalNetUtil;
-import client.nas.find.com.nasclient.util.Util;
 import jcifs.netbios.NbtAddress;
 
 /**
@@ -80,10 +83,9 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
         // 设置触发页面跳转
         mAdapter.setOnItemClickListener(new DeviceAdapter.ItemClickListener() {
             @Override
-            public void onclick() {
-                Log.i("msg", "执行跳转click");
-                //带消息跳转！！
-                getActivity().getFragmentManager().beginTransaction().replace(R.id.container_layout, fileFragment).commit();
+            public void onItemClick(DeviceAdapter adapter, int position) {
+
+                showDialog(adapter, position);
             }
         });
 
@@ -156,7 +158,7 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
      * @param v
      */
     public void addDevice(View v) {
-        Util.Toast("点击添加设备");
+        CommomUtil.Toast("点击添加设备");
     }
 
 
@@ -221,12 +223,47 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
             //结束等待窗口
             mProgressDialog.dismiss();
             Log.i("msg", "扫描完成");
-            Util.Toast("扫描完成");
+            CommomUtil.Toast("扫描完成");
             //需要将之前保存在adapter的数据清空，否则会重复（区别清空设备列表）
             mAdapter.clear();
             Log.i("msg", "装配前设备列表的长度：" + mDevices.size());
             mAdapter.addAll(mDevices);
         }
+    }
+
+    /**
+     * 表单窗口
+     *
+     * @param adapter
+     * @param position
+     */
+    private void showDialog(DeviceAdapter adapter, int position) {
+        final DeviceBean device = adapter.getItem(position);
+
+        CommonDialog dialog = new CommonDialog(context, R.style.dialog, "正在连接", new CommonDialog.OnCloseListener() {
+            @Override
+            public void onClick(Dialog dialog, boolean confirm, String username, String passwd, boolean isCheck) {
+                //如果是确认键
+                if (confirm) {
+                    Log.i("msg", "执行跳转click");
+                    //带消息跳转
+                    Bundle bundle = new Bundle();
+                    bundle.putString("username", username);
+                    bundle.putString("passwd", passwd);
+                    bundle.putString("ip", device.getIp());
+                    fileFragment.setArguments(bundle);
+
+                    getActivity().getFragmentManager().beginTransaction().replace(R.id.container_layout, fileFragment).commit();
+                }
+            }
+        });
+        dialog.setTitle("正在连接到 smb://" + device.getIp() + "/").show();
+
+        //手动设置对话框宽度
+        int screenWidth = CommomUtil.getScreenWidth();
+        WindowManager.LayoutParams p = dialog.getWindow().getAttributes();
+        p.width = (int) (screenWidth * 0.9); // 宽度设置为屏幕的0.9,高度不变
+        dialog.getWindow().setAttributes(p);
     }
 
     /**

@@ -16,7 +16,7 @@ import com.yanzhenjie.permission.PermissionListener;
 import java.util.List;
 
 import client.nas.find.com.nasclient.R;
-import client.nas.find.com.nasclient.util.Util;
+import client.nas.find.com.nasclient.util.CommomUtil;
 
 /**
  * @author Kevin-
@@ -67,7 +67,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         //初始化Util
-        Util.init(HomeActivity.this);
+        CommomUtil.init(HomeActivity.this);
 
         //申请权限，参考https://github.com/Kevin-miu/MPermission
         //由于涉及访问和写入存储空间和SD卡，在android6.0之后需要现实申请权限，否则报错

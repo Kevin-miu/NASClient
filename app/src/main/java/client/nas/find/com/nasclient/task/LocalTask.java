@@ -1,6 +1,7 @@
-package client.nas.find.com.nasclient.util;
+package client.nas.find.com.nasclient.task;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,20 +9,21 @@ import java.util.Collections;
 import java.util.List;
 
 import client.nas.find.com.nasclient.bean.FileBean;
+import client.nas.find.com.nasclient.util.LocalFileUtil;
 
 /**
  * @author Kevin-
- * @time
- * @description
- * @updateTime
+ * @time 20181210
+ * @description 异步任务，加快本地目录加载速度
+ * @updateTime 20181210
  */
 
-public class MyTask extends AsyncTask {
+public class LocalTask extends AsyncTask {
 
     private File file;
     private MyTaskUIOperation myTaskUIOperation;
 
-    public MyTask(File file) {
+    public LocalTask(File file) {
         this.file = file;
     }
 
@@ -31,6 +33,7 @@ public class MyTask extends AsyncTask {
         List<FileBean> fileBeanList = new ArrayList<>();
         if (file.isDirectory()) {
             File[] fileArray = file.listFiles();
+            Log.i("msg", "fileArray的长度：" + fileArray.length);
 
             if (fileArray != null) {
                 List<File> fileList = new ArrayList<>();
@@ -47,9 +50,7 @@ public class MyTask extends AsyncTask {
                     fileBean.setName(f.getName());
                     fileBean.setFileType(LocalFileUtil.getFileType(f));
                     fileBean.setHolderType(0);
-                    fileBean.setSize(f.length());
                     fileBean.setPath(f.getAbsolutePath());
-                    fileBean.setChildCount(LocalFileUtil.getFileChildCount(f));
 
                     fileBeanList.add(fileBean);
 

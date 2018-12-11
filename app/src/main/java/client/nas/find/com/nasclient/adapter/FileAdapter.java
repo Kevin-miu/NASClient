@@ -10,6 +10,8 @@ import java.util.List;
 
 import client.nas.find.com.nasclient.R;
 import client.nas.find.com.nasclient.adapter.base.RecyclerViewAdapter;
+import client.nas.find.com.nasclient.adapter.holder.FileHolder;
+import client.nas.find.com.nasclient.adapter.holder.LineHolder;
 import client.nas.find.com.nasclient.bean.FileBean;
 
 /**

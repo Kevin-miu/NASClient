@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import client.nas.find.com.nasclient.activity.MultiView;
+import client.nas.find.com.nasclient.activity.base.MultiView;
 
 /**
  * @author Kevin-

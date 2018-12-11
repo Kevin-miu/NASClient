@@ -11,8 +11,6 @@ public class DeviceBean {
 
     private String ip;
     private String hostname;
-    private String username;
-    private String passwd;
 
     public String getIp() {
         return ip;
@@ -22,7 +20,6 @@ public class DeviceBean {
         this.ip = ip;
     }
 
-
     public String getHostname() {
         return hostname;
     }
@@ -31,19 +28,4 @@ public class DeviceBean {
         this.hostname = hostname;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPasswd() {
-        return passwd;
-    }
-
-    public void setPasswd(String passwd) {
-        this.passwd = passwd;
-    }
 }

@@ -18,14 +18,15 @@ import java.util.List;
 
 import client.nas.find.com.nasclient.R;
 import client.nas.find.com.nasclient.adapter.FileAdapter;
-import client.nas.find.com.nasclient.adapter.FileHolder;
 import client.nas.find.com.nasclient.adapter.TitleAdapter;
 import client.nas.find.com.nasclient.adapter.base.RecyclerViewAdapter;
+import client.nas.find.com.nasclient.adapter.holder.FileHolder;
 import client.nas.find.com.nasclient.bean.FileBean;
 import client.nas.find.com.nasclient.bean.FileType;
 import client.nas.find.com.nasclient.bean.TitlePathBean;
+import client.nas.find.com.nasclient.task.LocalTask;
+import client.nas.find.com.nasclient.task.SmbTask;
 import client.nas.find.com.nasclient.util.LocalFileUtil;
-import client.nas.find.com.nasclient.util.MyTask;
 
 /**
  * @author Kevin-
@@ -51,7 +52,14 @@ public class FileFragment extends Fragment {
     //自定义变量（辅助）
     private File rootFile;
     private String rootPath;
-    private String smbRootPath;
+
+    private String username;
+    private String passwd;
+    private String ip;
+
+    private final String smbRootPath = "smb://OPENWRT/FamilyCloud/";
+    private String smbFullPath;
+
     private List<FileBean> fileBeanList;
 
     private CloudFragment cloudFragment;
@@ -122,7 +130,7 @@ public class FileFragment extends Fragment {
                     FileType fileType = fileBean.getFileType();
 
                     if (fileType == FileType.directory) {
-                        getFile(fileBean.getPath());
+                        getSmbFiles(fileBean.getPath());
 
                         refreshTitleState(fileBean.getName(), fileBean.getPath());
 
@@ -170,7 +178,7 @@ public class FileFragment extends Fragment {
             public void onItemClick(View view, RecyclerView.ViewHolder viewHolder, int position) {
                 TitlePathBean titlePathBean = (TitlePathBean) mTitleAdapter.getItem(position);
 
-                getFile(titlePathBean.getPath());
+                getSmbFiles(titlePathBean.getPath());
 
                 int count = mTitleAdapter.getItemCount();
                 int removeCount = count - position - 1;
@@ -180,13 +188,19 @@ public class FileFragment extends Fragment {
             }
         });
 
-        //rootPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        //refreshTitleState("共享空间", rootPath);
-        //smbRootPath=
+        //获取上一个fragment传入的数据
+        username = getArguments().getString("username");
+        passwd = getArguments().getString("passwd");
+        ip = getArguments().getString("ip");
+        //        username = "wifish";
+        //        passwd = "findlab404";
+        //        ip = "192.168.1.1";
 
-        refreshTitleState("共享空间", smbRootPath);
+        refreshTitleState("FamilyCloud", smbRootPath);
 
-        getFile(rootPath);
+        smbFullPath = smbRootPath;
+
+        getSmbFiles(smbFullPath);
 
     }
 
@@ -205,18 +219,18 @@ public class FileFragment extends Fragment {
     }
 
     /**
-     * 获取目录里的文件
+     * 获取本地根目录里的文件
      *
      * @param path
      */
-    public void getFile(String path) {
+    public void getFiles(String path) {
 
         rootFile = new File(path + File.separator);
 
-        MyTask myTask = new MyTask(rootFile);
+        LocalTask localTask = new LocalTask(rootFile);
 
         //重写回调接口，在MyTask中完成对UI的操作
-        myTask.setMyTaskUIOperation(new MyTask.MyTaskUIOperation() {
+        localTask.setMyTaskUIOperation(new LocalTask.MyTaskUIOperation() {
             @Override
             public void setFileBeanListByMyTask(List<FileBean> list) {
                 fileBeanList = list;
@@ -234,7 +248,36 @@ public class FileFragment extends Fragment {
             }
         });
 
-        myTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+        localTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+    }
+
+    /**
+     * 获取smb文件根目录的文件
+     */
+    public void getSmbFiles(String smbPath) {
+
+        SmbTask smbTask = new SmbTask(smbPath, username, passwd, ip);
+
+        smbTask.setMyTaskUIOperation(new SmbTask.MyTaskUIOperation() {
+            @Override
+            public void setFileBeanListByMyTask(List<FileBean> list) {
+                fileBeanList = list;
+            }
+
+            @Override
+            public void setEmptyContainerByMyTask() {
+                //如果没有文件则显示空布局
+                if (fileBeanList.size() > 0) {
+                    noFileContainer.setVisibility(View.GONE);
+                } else {
+                    noFileContainer.setVisibility(View.VISIBLE);
+                }
+                mFileAdapter.refresh(fileBeanList);
+            }
+        });
+
+        smbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+
     }
 
     /**
@@ -246,10 +289,11 @@ public class FileFragment extends Fragment {
         if (titlePathList.size() == 1) {
             //跳回cloudfragment
             mHomeActivity.getFragmentManager().beginTransaction().replace(R.id.container_layout, cloudFragment).commit();
+            mHomeActivity = null;
         } else {
             //跳回上一页
             mTitleAdapter.removeItem(titlePathList.size() - 1);
-            getFile(titlePathList.get(titlePathList.size() - 1).getPath());
+            getSmbFiles(titlePathList.get(titlePathList.size() - 1).getPath());
         }
     }
 }

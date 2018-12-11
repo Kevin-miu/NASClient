@@ -1,4 +1,4 @@
-package client.nas.find.com.nasclient.activity;
+package client.nas.find.com.nasclient.activity.base;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -14,7 +14,7 @@ import java.util.List;
 
 import client.nas.find.com.nasclient.R;
 import client.nas.find.com.nasclient.adapter.base.MultiAdapter;
-import client.nas.find.com.nasclient.util.Util;
+import client.nas.find.com.nasclient.util.CommomUtil;
 
 /**
  * @author Kevin-
@@ -50,12 +50,12 @@ public class MultiView extends ViewGroup {
 
     public MultiView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        Util.init(context);
+        CommomUtil.init(context);
 
         mData = new ArrayList<>();
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MultiView);
-        divideSpace = (int) typedArray.getDimension(R.styleable.MultiView_divideSpace, Util.dip2px(2));
+        divideSpace = (int) typedArray.getDimension(R.styleable.MultiView_divideSpace, CommomUtil.dip2px(2));
         placeholder = typedArray.getResourceId(R.styleable.MultiView_placeholder, -1);
         typedArray.recycle();
     }

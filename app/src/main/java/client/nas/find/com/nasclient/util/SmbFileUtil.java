@@ -14,8 +14,11 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import client.nas.find.com.nasclient.bean.FileType;
+import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 import jcifs.smb.SmbFileInputStream;
@@ -29,6 +32,36 @@ import jcifs.smb.SmbFileOutputStream;
  */
 
 public class SmbFileUtil {
+
+    static String path;
+    static String userpwd;
+    static NtlmPasswordAuthentication auth;
+
+    public static void connecting(String pathStr, String userpwdStr) {
+        path = pathStr;
+        userpwd = userpwdStr;
+        auth = new NtlmPasswordAuthentication(userpwd);
+    }
+
+    /**
+     * 获取smb根目录文件
+     *
+     * @return
+     */
+    public static SmbFile getSmbFile() {
+        SmbFile smbFile = null;
+
+        try {
+            smbFile = new SmbFile(userpwd, auth);
+            Log.i("msg", "smbFile不为空");
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            Log.i("msg", "smbFile为空");
+        } finally {
+            return smbFile;
+        }
+    }
 
     /**
      * 读取共享文件夹下的所有文件(文件夹)的名称
@@ -199,4 +232,80 @@ public class SmbFileUtil {
             return flag;
         }
     }
+
+
+    /**
+     * 获取文件类型
+     *
+     * @param smbFile
+     * @return
+     */
+    public static FileType getFileType(SmbFile smbFile) {
+        String fileName;
+
+        try {
+
+            if (smbFile.isDirectory()) {
+                return FileType.directory;
+            }
+            fileName = smbFile.getName().toLowerCase();
+        } catch (SmbException e) {
+            fileName = null;
+            e.printStackTrace();
+        }
+
+        if (fileName.endsWith(".mp3")) {
+            return FileType.music;
+        }
+
+        if (fileName.endsWith(".mp4") || fileName.endsWith(".avi")
+                || fileName.endsWith(".3gp") || fileName.endsWith(".mov")
+                || fileName.endsWith(".rmvb") || fileName.endsWith(".mkv")
+                || fileName.endsWith(".flv") || fileName.endsWith(".rm")) {
+            return FileType.video;
+        }
+
+        if (fileName.endsWith(".txt") || fileName.endsWith(".log") || fileName.endsWith(".xml")) {
+            return FileType.txt;
+        }
+
+        if (fileName.endsWith(".zip") || fileName.endsWith(".rar")) {
+            return FileType.zip;
+        }
+
+        if (fileName.endsWith(".png") || fileName.endsWith(".gif")
+                || fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+            return FileType.image;
+        }
+
+        if (fileName.endsWith(".apk")) {
+            return FileType.apk;
+        }
+
+        return FileType.other;
+
+    }
+
+    /**
+     * 文件按照名字排序
+     */
+    public static Comparator comparator = new Comparator<SmbFile>() {
+        @Override
+        public int compare(SmbFile file1, SmbFile file2) {
+
+            try {
+
+                if (file1.isDirectory() && file2.isFile()) {
+                    return -1;
+                } else if (file1.isFile() && file2.isDirectory()) {
+                    return 1;
+                } else {
+                    return file1.getName().compareTo(file2.getName());
+                }
+            } catch (SmbException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        }
+    };
 }

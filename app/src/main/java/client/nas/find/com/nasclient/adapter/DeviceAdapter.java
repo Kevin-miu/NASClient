@@ -1,20 +1,16 @@
 package client.nas.find.com.nasclient.adapter;
 
 
-import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import client.nas.find.com.nasclient.R;
-import client.nas.find.com.nasclient.activity.CommonDialog;
 import client.nas.find.com.nasclient.adapter.base.MultiAdapter;
 import client.nas.find.com.nasclient.bean.DeviceBean;
-import client.nas.find.com.nasclient.util.Util;
 
 /**
  * @author Kevin-
@@ -61,36 +57,12 @@ public class DeviceAdapter extends MultiAdapter<DeviceBean> {
     @Override
     public void setOnItemClick(final int position) {
         super.setOnItemClick(position);
-
-        final DeviceBean device = getItem(position);
-
-        CommonDialog dialog = new CommonDialog(context, R.style.dialog, "确定删除此消息" + Integer.toString(position), new CommonDialog.OnCloseListener() {
-            @Override
-            public void onClick(Dialog dialog, boolean confirm, String username, String passwd, boolean isCheck) {
-                //如果是确认键
-                if (confirm) {
-                    //1.传递用username和passwd
-
-                    Util.Toast("用户 " + username + "正在请求，密码是" + passwd);
-
-                    //2.触发跳转
-                    mItemClickListener.onclick();
-
-                }
-            }
-        });
-        dialog.setTitle("正在连接到 smb://" + device.getIp() + "/").show();
-
-        //手动设置对话框宽度
-        int screenWidth = Util.getScreenWidth();
-        WindowManager.LayoutParams p = dialog.getWindow().getAttributes();
-        p.width = (int) (screenWidth * 0.9); // 宽度设置为屏幕的0.9,高度不变
-        dialog.getWindow().setAttributes(p);
+        mItemClickListener.onItemClick(this, position);
     }
 
     //定义触发跳转的回调接口
     public interface ItemClickListener {
-        void onclick();
+        void onItemClick(DeviceAdapter adppter, int position);
     }
 
     public void setOnItemClickListener(ItemClickListener itemClick) {

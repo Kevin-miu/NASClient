@@ -1,4 +1,4 @@
-package client.nas.find.com.nasclient.adapter;
+package client.nas.find.com.nasclient.adapter.holder;
 
 import android.view.View;
 import android.widget.TextView;

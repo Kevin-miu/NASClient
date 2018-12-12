@@ -40,7 +40,7 @@ public class CommonDialog extends Dialog implements View.OnClickListener {
 
     private String username;
     private String passwd;
-    private Boolean isCkecked;
+    private Boolean isChecked;
 
     public CommonDialog(Context context) {
         super(context);
@@ -80,16 +80,19 @@ public class CommonDialog extends Dialog implements View.OnClickListener {
         return this;
     }
 
-    public String getDialogUsernameEd() {
-        return username;
+    public CommonDialog setUsernameEd(String username) {
+        this.username = username;
+        return this;
     }
 
-    public String getDialogPasswdEd() {
-        return passwd;
+    public CommonDialog setPasswdEd(String passwd) {
+        this.passwd = passwd;
+        return this;
     }
 
-    public boolean getDialogCheckBox() {
-        return isCkecked;
+    public CommonDialog setCheckBox(boolean isChecked) {
+        this.isChecked = isChecked;
+        return this;
     }
 
     @Override
@@ -127,6 +130,18 @@ public class CommonDialog extends Dialog implements View.OnClickListener {
             dialogTitleTxt.setText(title);
         }
 
+        if (!TextUtils.isEmpty(username)) {
+            dialogUsernameEd.setText(username);
+        }
+
+        if (!TextUtils.isEmpty(passwd)) {
+            dialogPasswdEd.setText(passwd);
+        }
+
+        if (isChecked != null) {
+            dialogCheckBox.setChecked(isChecked);
+        }
+
     }
 
     @Override
@@ -143,9 +158,9 @@ public class CommonDialog extends Dialog implements View.OnClickListener {
                     //获取输入值
                     username = dialogUsernameEd.getText().toString().trim();
                     passwd = dialogPasswdEd.getText().toString().trim();
-                    isCkecked = dialogCheckBox.isChecked();
+                    isChecked = dialogCheckBox.isChecked();
 
-                    listener.onClick(this, true, username, passwd, isCkecked);
+                    listener.onClick(this, true, username, passwd, isChecked);
 
                     this.dismiss();
                 }

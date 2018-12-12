@@ -157,10 +157,10 @@ public class LocalNetUtil {
     /**
      * 定义（静态）回调接口，必须实现以下回调方法
      */
-    public static interface ScanIpCallback {
-        public void onFound(List<String> ips, String msg);
+    public interface ScanIpCallback {
+        void onFound(List<String> ips, String msg);
 
-        public void onNotFound(List<String> ips, String msg);
+        void onNotFound(List<String> ips, String msg);
     }
 
 

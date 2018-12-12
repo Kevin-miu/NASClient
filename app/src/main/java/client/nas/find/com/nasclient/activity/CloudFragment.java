@@ -28,6 +28,7 @@ import client.nas.find.com.nasclient.adapter.DeviceAdapter;
 import client.nas.find.com.nasclient.bean.DeviceBean;
 import client.nas.find.com.nasclient.util.CommomUtil;
 import client.nas.find.com.nasclient.util.LocalNetUtil;
+import client.nas.find.com.nasclient.util.PerferenceUtil;
 import jcifs.netbios.NbtAddress;
 
 /**
@@ -42,7 +43,6 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
     //主界面（UI线程）变量、空间等
     private View view;
     private Context context;
-    private HomeActivity mHomeActivity;
     private boolean isExit = false;
     private ProgressDialog mProgressDialog = null;
     private Button btnScan, btnAdd;
@@ -61,11 +61,22 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
     private List<String> mIps = new ArrayList<>();
     private List<String> mHostNames = new ArrayList<>();
 
+    //回调接口实例化
+    private OnSwitchFragment onSwitchFragment;
+
     /**
      * 设置Context
      */
     public void setContext(Context context) {
         this.context = context;
+    }
+
+    public interface OnSwitchFragment {
+        void switchFragmentToFileFragment(Fragment fragment);
+    }
+
+    public void setOnSwitchFragment(OnSwitchFragment onSwitchFragment) {
+        this.onSwitchFragment = onSwitchFragment;
     }
 
     @Nullable
@@ -89,6 +100,21 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
             }
         });
 
+        //从sharepreference中获取默认值
+        String perIP = PerferenceUtil.getIp(context);
+        String perHostname = PerferenceUtil.getHostname(context);
+
+        if (perIP != "" && perHostname != "") {
+            DeviceBean deviceBean = new DeviceBean();
+            deviceBean.setHostname(perHostname);
+            deviceBean.setIp(perIP);
+
+            if (!mDevices.contains(deviceBean)) {
+                //仅当不存在设备列表中才添加
+                mDevices.add(deviceBean);
+            }
+        }
+
         mAdapter.addAll(mDevices);
 
 
@@ -111,21 +137,6 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
         });
 
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        //强制将本fragment与HomeActivity绑定，但是存在内存泄露的风险
-        this.mHomeActivity = (HomeActivity) context;
-    }
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        //不解绑,存在内存泄露的风险
-        //this.mHomeActivity = null;
     }
 
     /**
@@ -246,6 +257,18 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
                 //如果是确认键
                 if (confirm) {
                     Log.i("msg", "执行跳转click");
+
+                    //这边要先将设置默认的值保存到sharePreference中
+                    if (isCheck) {
+                        //PerferenceUtil.setWorkgroup("OPENWRT", context);
+                        //PerferenceUtil.setFolder("FamilyCloud",context);
+                        PerferenceUtil.setCheck(isCheck, context);
+                        PerferenceUtil.setIp(device.getIp(), context);
+                        PerferenceUtil.setHostname(device.getHostname(), context);
+                        PerferenceUtil.setUser(username, context);
+                        PerferenceUtil.setPass(passwd, context);
+                    }
+
                     //带消息跳转
                     Bundle bundle = new Bundle();
                     bundle.putString("username", username);
@@ -253,11 +276,16 @@ public class CloudFragment extends Fragment implements LocalNetUtil.ScanIpCallba
                     bundle.putString("ip", device.getIp());
                     fileFragment.setArguments(bundle);
 
-                    getActivity().getFragmentManager().beginTransaction().replace(R.id.container_layout, fileFragment).commit();
+
+                    //这里切换时可能会有问题
+                    onSwitchFragment.switchFragmentToFileFragment(fileFragment);
                 }
             }
         });
-        dialog.setTitle("正在连接到 smb://" + device.getIp() + "/").show();
+        //设置窗口的控件默认值
+        dialog.setTitle("正在连接到 smb://" + device.getIp() + "/").setCheckBox(PerferenceUtil.getCheck(context)).
+                setUsernameEd(PerferenceUtil.getUser(context)).setPasswdEd(PerferenceUtil.getPass(context)).
+                show();
 
         //手动设置对话框宽度
         int screenWidth = CommomUtil.getScreenWidth();

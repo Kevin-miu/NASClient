@@ -26,6 +26,7 @@ import client.nas.find.com.nasclient.bean.FileType;
 import client.nas.find.com.nasclient.bean.TitlePathBean;
 import client.nas.find.com.nasclient.task.LocalTask;
 import client.nas.find.com.nasclient.task.SmbTask;
+import client.nas.find.com.nasclient.util.CommomUtil;
 import client.nas.find.com.nasclient.util.LocalFileUtil;
 
 /**
@@ -40,7 +41,6 @@ public class FileFragment extends Fragment {
     //定义相关控件
     private View view;
     private Context context;
-    private HomeActivity mHomeActivity;
     private RecyclerView titleRecylerView;
     private RecyclerView fileRecylerView;
     private LinearLayout noFileContainer;
@@ -62,7 +62,7 @@ public class FileFragment extends Fragment {
 
     private List<FileBean> fileBeanList;
 
-    private CloudFragment cloudFragment;
+    private OnSwitchFragment onSwitchFragment;
 
     /**
      * 设置context
@@ -71,6 +71,15 @@ public class FileFragment extends Fragment {
      */
     public void setContext(Context context) {
         this.context = context;
+    }
+
+
+    public interface OnSwitchFragment {
+        void switchFragmentTocCloudFragment();
+    }
+
+    public void setOnSwitchFragment(OnSwitchFragment onSwitchFragment) {
+        this.onSwitchFragment = onSwitchFragment;
     }
 
     @Nullable
@@ -84,28 +93,10 @@ public class FileFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        //强制将本fragment与HomeActivity绑定，但是存在内存泄露的风险
-        this.mHomeActivity = (HomeActivity) context;
-    }
-
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        //解绑,存在内存泄露的风险
-        //this.mHomeActivity = null;
-    }
-
     /**
      * 初始化操作
      */
     private void initView() {
-
-        cloudFragment = new CloudFragment();
-        cloudFragment.setContext(context);
 
         //设置titleRecylerView属性
         titleRecylerView = view.findViewById(R.id.title_recycler);
@@ -274,6 +265,11 @@ public class FileFragment extends Fragment {
                 }
                 mFileAdapter.refresh(fileBeanList);
             }
+
+            @Override
+            public void nullSmbFileInMyTask() {
+                CommomUtil.Toast("用户名或密码错误");
+            }
         });
 
         smbTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
@@ -288,7 +284,7 @@ public class FileFragment extends Fragment {
         List<TitlePathBean> titlePathList = (List<TitlePathBean>) mTitleAdapter.getAdapterData();
         if (titlePathList.size() == 1) {
             //跳回cloudfragment
-            mHomeActivity.getFragmentManager().beginTransaction().replace(R.id.container_layout, cloudFragment).commit();
+            onSwitchFragment.switchFragmentTocCloudFragment();
         } else {
             //跳回上一页
             mTitleAdapter.removeItem(titlePathList.size() - 1);

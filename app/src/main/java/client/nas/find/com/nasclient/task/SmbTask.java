@@ -11,6 +11,7 @@ import java.util.List;
 import client.nas.find.com.nasclient.bean.FileBean;
 import client.nas.find.com.nasclient.util.SmbFileUtil;
 import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbAuthException;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -53,9 +54,8 @@ public class SmbTask extends AsyncTask {
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        } finally {
-            return rootSmbFile;
         }
+        return rootSmbFile;
     }
 
     @Override
@@ -99,12 +99,15 @@ public class SmbTask extends AsyncTask {
                     }
                 }
             }
+        } catch (SmbAuthException e) {
+            e.printStackTrace();
+            myTaskUIOperation.nullSmbFileInMyTask();
         } catch (SmbException e) {
             e.printStackTrace();
         } finally {
             myTaskUIOperation.setFileBeanListByMyTask(fileBeanList);
-            return fileBeanList;
         }
+        return fileBeanList;
     }
 
     @Override
@@ -117,6 +120,8 @@ public class SmbTask extends AsyncTask {
         void setFileBeanListByMyTask(List<FileBean> list);
 
         void setEmptyContainerByMyTask();
+
+        void nullSmbFileInMyTask();
     }
 
     public void setMyTaskUIOperation(SmbTask.MyTaskUIOperation myTaskUIOperation) {

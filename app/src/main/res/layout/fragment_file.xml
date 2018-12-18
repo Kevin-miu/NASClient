@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container_file"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="client.nas.find.com.nasclient.activity.FileFragment">
@@ -40,12 +39,20 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/title_container">
 
+        <!--<ScrollView-->
+        <!--android:id="@+id/scroll"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/file_recycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffffff">
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            android:scrollbars="vertical">
         </android.support.v7.widget.RecyclerView>
+
+        <!--</ScrollView>-->
 
         <LinearLayout
             android:id="@+id/no_file_container"
@@ -74,26 +81,14 @@
 
     </RelativeLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/float_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/float_upload_48"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/btn_container2"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent">-->
-
-        <!--<Button-->
-            <!--android:id="@+id/btn_upload"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginLeft="10dp"-->
-            <!--android:layout_marginRight="10dp"-->
-            <!--android:layout_marginBottom="5dp"-->
-            <!--android:layout_weight="3"-->
-            <!--android:background="@drawable/bt_round"-->
-            <!--android:text="@string/btn_upload"-->
-            <!--android:textSize="16sp"/>-->
-
-    <!--</LinearLayout>-->
 
 </android.support.constraint.ConstraintLayout>

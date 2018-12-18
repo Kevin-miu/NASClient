@@ -1,28 +1,12 @@
 package client.nas.find.com.nasclient.util;
 
-import android.util.Log;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import client.nas.find.com.nasclient.bean.FileType;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
-import jcifs.smb.SmbFileInputStream;
-import jcifs.smb.SmbFileOutputStream;
 
 /**
  * @author Kevin-
@@ -33,206 +17,37 @@ import jcifs.smb.SmbFileOutputStream;
 
 public class SmbFileUtil {
 
-    static String path;
-    static String userpwd;
-    static NtlmPasswordAuthentication auth;
+    private static String cacheDir = "cache";
 
-    public static void connecting(String pathStr, String userpwdStr) {
-        path = pathStr;
-        userpwd = userpwdStr;
-        auth = new NtlmPasswordAuthentication(userpwd);
-    }
+    private static String mIp;
+    private static String mUsername;
+    private static String mPasswd;
 
-    /**
-     * 获取smb根目录文件
-     *
-     * @return
-     */
-    public static SmbFile getSmbFile() {
-        SmbFile smbFile = null;
+    private SmbFile fetchSmbFile(String smbPath) {
 
+        SmbFile rootSmbFile = null;
         try {
-            smbFile = new SmbFile(userpwd, auth);
-            Log.i("msg", "smbFile不为空");
+            NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(mIp, mUsername, mPasswd);
+            rootSmbFile = new SmbFile(smbPath, auth);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
-            Log.i("msg", "smbFile为空");
-        } finally {
-            return smbFile;
         }
+        return rootSmbFile;
     }
 
     /**
-     * 读取共享文件夹下的所有文件(文件夹)的名称
+     * 使用该工具类前，必须初始化
      *
-     * @param remoteUrl
+     * @param ip
+     * @param username
+     * @param passwd
      */
-    public static List<SmbFile> getSmbFileList(String remoteUrl) {
-
-        SmbFile smbFile;
-        List<SmbFile> fileList = null;
-
-        try {
-            // smb://userName:passWord@host/path/
-            smbFile = new SmbFile(remoteUrl);
-            fileList = new ArrayList<>();
-
-            if (!smbFile.exists()) {
-                Log.i("msg", "没有文件");
-            } else {
-                SmbFile[] files = smbFile.listFiles();
-                //转换成列表list
-                Collections.addAll(fileList, files);
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (SmbException e) {
-            e.printStackTrace();
-        } finally {
-            return fileList;
-        }
+    public static void init(String ip, String username, String passwd) {
+        mIp = ip;
+        mUsername = username;
+        mPasswd = passwd;
     }
-
-    /**
-     * 创建文件夹
-     *
-     * @param remoteUrl
-     * @param folderName
-     * @return
-     */
-    public static boolean smbMkDir(String remoteUrl, String folderName) {
-        SmbFile smbFile;
-        boolean flag = false;
-        try {
-            // smb://userName:passWord@host/path/folderName
-            smbFile = new SmbFile(remoteUrl + folderName);
-            if (!smbFile.exists()) {
-                smbFile.mkdir();
-                flag = true;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (SmbException e) {
-            e.printStackTrace();
-        } finally {
-            return flag;
-        }
-    }
-
-
-    /**
-     * 上传文件
-     *
-     * @param remoteUrl     smb文件协议url
-     * @param smbFolderPath smb文件夹路径
-     * @param localFilePath 本地文件路径
-     * @param fileName      本地文件名
-     */
-    public static boolean uploadFileToSmbFolder(String remoteUrl, String smbFolderPath, String localFilePath, String fileName) {
-
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        boolean flag = false;
-
-        try {
-            File localFile = new File(localFilePath);
-            inputStream = new FileInputStream(localFile);
-            // smb://userName:passWord@host/path/shareFolderPath/fileName
-            SmbFile smbFile = new SmbFile(remoteUrl + smbFolderPath + "/" + fileName);
-            smbFile.connect();
-            outputStream = new SmbFileOutputStream(smbFile);
-            byte[] buffer = new byte[4096];
-            int len = 0; // 读取长度
-            while ((len = inputStream.read(buffer, 0, buffer.length)) != -1) {
-                outputStream.write(buffer, 0, len);
-            }
-            // 刷新缓冲的输出流
-            outputStream.flush();
-            flag = true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                outputStream.close();
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return flag;
-        }
-    }
-
-    /**
-     * 下载文件到指定文件夹
-     *
-     * @param remoteUrl
-     * @param shareFolderPath
-     * @param fileName
-     * @param localDir
-     */
-    public static boolean downloadFileToFolder(String remoteUrl, String shareFolderPath, String fileName, String localDir) {
-
-        InputStream in = null;
-        OutputStream out = null;
-        boolean flag = false;
-
-        try {
-            SmbFile remoteFile = new SmbFile(remoteUrl + shareFolderPath + File.separator + fileName);
-            File localFile = new File(localDir + File.separator + fileName);
-            in = new BufferedInputStream(new SmbFileInputStream(remoteFile));
-            out = new BufferedOutputStream(new FileOutputStream(localFile));
-            byte[] buffer = new byte[1024];
-            while (in.read(buffer) != -1) {
-                out.write(buffer);
-                buffer = new byte[1024];
-            }
-            flag = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return flag;
-        }
-    }
-
-    /**
-     * 删除文件
-     *
-     * @param remoteUrl
-     * @param shareFolderPath
-     * @param fileName
-     */
-    public static boolean deleteFile(String remoteUrl, String shareFolderPath, String fileName) {
-
-        SmbFile SmbFile;
-        boolean flag = false;
-
-        try {
-            // smb://userName:passWord@host/path/shareFolderPath/fileName
-            SmbFile = new SmbFile(remoteUrl + shareFolderPath + "/" + fileName);
-            if (SmbFile.exists()) {
-                SmbFile.delete();
-                flag = true;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (SmbException e) {
-            e.printStackTrace();
-        } finally {
-            return flag;
-        }
-    }
-
 
     /**
      * 获取文件类型
@@ -308,4 +123,26 @@ public class SmbFileUtil {
             }
         }
     };
+
+
+    /**
+     * 打开图片资源
+     *
+     * @param smbPath
+     */
+    //    public static void openImage(Context context,String smbPath) {
+    //
+    //        //1. 先缓存
+    //
+    //
+    //
+    //        //2. 然后在本地中打开
+    //        Uri path = Uri.fromFile(file);
+    //        Intent intent = new Intent(Intent.ACTION_VIEW);
+    //        intent.addCategory("android.intent.category.DEFAULT");
+    //        intent.setDataAndType(path, "image/*");
+    //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    //        context.startActivity(intent);
+    //    }
+
 }
